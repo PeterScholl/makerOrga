@@ -47,8 +47,8 @@ function roleBadge(string $role): string
     return "<span class=\"badge $class\">$label</span>";
 }
 
-// Gibt einen HTML-String sicher aus (verhindert XSS)
-function e(string $value): string
+// Gibt einen HTML-String sicher aus (verhindert XSS). null wird als '' behandelt.
+function e(?string $value): string
 {
-    return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+    return htmlspecialchars($value ?? '', ENT_QUOTES, 'UTF-8');
 }

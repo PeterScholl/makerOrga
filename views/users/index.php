@@ -28,7 +28,7 @@
                         <?= e($user['name']) ?>
                     </a>
                 </td>
-                <td><?= e($user['email']) ?></td>
+                <td><?= $user['email'] ? e($user['email']) : '<span class="text-muted">—</span>' ?></td>
                 <td><?= roleBadge($user['role']) ?></td>
                 <td>
                     <?php if (($_SESSION['user_role'] ?? '') === 'admin'): ?>
