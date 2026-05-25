@@ -1,0 +1,20 @@
+# SQLite-Datenbank (wird lokal generiert, gehört nicht ins Repo)
+*.sqlite
+*.db
+
+# Lokale Konfiguration mit Passwörtern o.ä.
+config/local.php
+
+# Betriebssystem
+.DS_Store
+Thumbs.db
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+/logs/
