@@ -5,6 +5,54 @@ Kein Anspruch auf Vollständigkeit — nur das Wichtigste zum Loslegen.
 
 ---
 
+## Router
+
+Ein Router entscheidet welcher Code ausgeführt wird, abhängig davon welche URL aufgerufen wurde.
+
+**Das Problem ohne Router:**  
+Ohne Router bräuchte jede Seite eine eigene PHP-Datei: `orders.php`, `customers.php`, `orders_edit.php` usw. Diese Dateien wären direkt über den Browser erreichbar, die Ordnerstruktur wäre eng an die URLs gekoppelt, und es gäbe keinen zentralen Ort um z.B. Login-Prüfungen für alle Seiten einzubauen.
+
+**Die Lösung:**  
+Es gibt nur einen einzigen Einstiegspunkt: `public/index.php`. Die Datei `public/.htaccess` sorgt dafür, dass *alle* Anfragen dort ankommen — egal welche URL aufgerufen wurde:
+
+```text
+Browser ruft /orders auf
+    → .htaccess leitet weiter an public/index.php
+        → Router liest die URL aus
+        → findet die passende Route: GET /orders → OrderController::index()
+        → ruft die Methode auf
+```
+
+**Routen** sind die Verbindung zwischen einer URL+Methode und einer Controller-Methode:
+
+```php
+$router->get('/orders',        [OrderController::class, 'index']);   // Liste
+$router->get('/orders/{id}',   [OrderController::class, 'show']);    // Einzelansicht
+$router->post('/orders',       [OrderController::class, 'store']);   // Formular speichern
+```
+
+**URL-Parameter** wie `{id}` werden aus der URL extrahiert und an die Controller-Methode übergeben:
+
+```text
+GET /orders/42  →  OrderController::show(42)
+```
+
+**Schritt für Schritt am Beispiel `/orders/42`:**
+
+```text
+1. Browser         → sendet GET-Anfrage an /orders/42
+2. .htaccess       → erkennt: keine echte Datei → leitet weiter an public/index.php
+3. public/index.php → lädt den Autoloader, registriert alle Routen, ruft dispatch() auf
+4. Router::dispatch() → vergleicht GET /orders/42 mit jeder registrierten Route
+5. match()         → Route /orders/{id} passt → extrahiert "42" als Parameter
+6. OrderController::show(42) wird aufgerufen
+7. show()          → fragt das Model: Order::findById(42)
+8. Model           → holt den Datensatz aus der SQLite-Datenbank
+9. View            → bekommt die Daten und gibt HTML an den Browser zurück
+```
+
+---
+
 ## Composer
 
 Composer ist ein Werkzeug das fremden Code für das eigene Projekt verwaltet.

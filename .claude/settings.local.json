@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php -l /home/peter/skripte/makerOrga/src/Router.php)",
+      "Bash(php -l /home/peter/skripte/makerOrga/public/index.php)"
+    ]
+  }
+}
