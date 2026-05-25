@@ -176,6 +176,76 @@ $pdo = Database::connection(); // gibt dieselbe Verbindung zurück
 
 ---
 
+## CRUD
+
+CRUD ist ein Kürzel für die vier Grundoperationen die man mit Datenbankeinträgen durchführen kann:
+
+| Buchstabe | Operation | SQL | HTTP-Methode |
+| --------- | --------- | --- | ------------ |
+| **C**reate | Anlegen | `INSERT` | `POST` |
+| **R**ead | Lesen | `SELECT` | `GET` |
+| **U**pdate | Ändern | `UPDATE` | `POST` |
+| **D**elete | Löschen | `DELETE` | `POST` |
+
+Wenn man sagt "ein Controller implementiert CRUD", meint man: er kann Einträge anlegen, anzeigen, bearbeiten und löschen. Fast jeder Bereich der App (Aufträge, Kunden, Mitarbeiter) folgt diesem Muster.
+
+Die HTTP-Methoden `PUT`, `PATCH` und `DELETE` existieren zwar, werden aber von HTML-Formularen nicht unterstützt — deshalb verwenden wir für Update und Delete ebenfalls `POST`.
+
+---
+
+## Controller-Hilfsmethoden
+
+Die Basisklasse `Controller` stellt drei Methoden bereit die jeder Controller erbt:
+
+**`render(string $view, array $data)`**  
+Lädt eine View-Datei und gibt sie als HTML aus. Der `$data`-Parameter macht Variablen in der View verfügbar:
+
+```php
+$this->render('orders/index', ['orders' => $orders]);
+// In der View ist dann $orders direkt verfügbar
+```
+
+Intern nutzt `render()` einen Output-Buffer: Die View wird zunächst unsichtbar gerendert, das Ergebnis als `$content` gespeichert und dann ins Layout eingebettet.
+
+**`redirect(string $path)`**  
+Schickt den Browser auf eine andere URL. Wird nach jedem erfolgreichen Speichern aufgerufen (siehe Post/Redirect/Get weiter unten):
+
+```php
+$this->redirect('/orders');  // Browser landet auf der Auftragsliste
+```
+
+**`clean(string $value)`**  
+Entfernt Leerzeichen am Anfang und Ende eines Textes. Gibt `null` zurück wenn der Text danach leer ist — so entstehen keine leeren Strings in der Datenbank:
+
+```php
+$this->clean('  Hallo  ');  // → 'Hallo'
+$this->clean('   ');        // → null
+```
+
+---
+
+## Post/Redirect/Get
+
+Ein Muster das verhindert dass ein Formular beim Browser-Refresh doppelt abgeschickt wird.
+
+**Das Problem:**  
+Speichert man einen Auftrag mit POST und lädt danach die Seite neu, fragt der Browser: "Soll das Formular nochmal abgeschickt werden?" — und der Eintrag wird doppelt angelegt.
+
+**Die Lösung:**  
+Nach einem erfolgreichen POST nicht die View direkt ausgeben, sondern auf eine GET-Seite weiterleiten:
+
+```text
+1. Browser schickt POST /orders (Formular)
+2. Controller speichert den Auftrag
+3. Controller antwortet: redirect → GET /orders
+4. Browser lädt die Liste neu (GET)
+5. Browser-Refresh wiederholt nur den harmlosen GET
+```
+
+In jedem Controller sieht das so aus: `store()` und `update()` enden immer mit `$this->redirect(...)`.
+
+---
+
 ## .htaccess und der `public/`-Ordner
 
 Nur der Ordner `public/` ist vom Webserver erreichbar. Alle anderen Ordner (`src/`, `config/`, `db/`) liegen außerhalb des Web-Roots und können nicht direkt über den Browser aufgerufen werden.

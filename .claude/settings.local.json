@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "Bash(php -l /home/peter/skripte/makerOrga/src/Router.php)",
-      "Bash(php -l /home/peter/skripte/makerOrga/public/index.php)"
+      "Bash(php -l /home/peter/skripte/makerOrga/public/index.php)",
+      "Bash(php -l /home/peter/skripte/makerOrga/src/controllers/Controller.php)",
+      "Bash(php -l /home/peter/skripte/makerOrga/src/controllers/OrderController.php)",
+      "Bash(php -l /home/peter/skripte/makerOrga/src/controllers/CustomerController.php)",
+      "Bash(php -l /home/peter/skripte/makerOrga/src/controllers/UserController.php)",
+      "Bash(php -l /home/peter/skripte/makerOrga/src/controllers/ActivityController.php)"
     ]
   }
 }
