@@ -25,9 +25,9 @@
 
             <form method="post" action="/login">
                 <div class="mb-3">
-                    <label class="form-label">E-Mail</label>
-                    <input type="email" name="email" class="form-control"
-                           autofocus required autocomplete="email">
+                    <label class="form-label">Benutzername</label>
+                    <input type="text" name="username" class="form-control"
+                           autofocus required autocomplete="username">
                 </div>
                 <div class="mb-4">
                     <label class="form-label">Passwort</label>

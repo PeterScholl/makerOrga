@@ -23,6 +23,13 @@ $val     = fn(string $key) => e((string)($user[$key] ?? ''));
                        value="<?= $val('name') ?>" required>
             </div>
             <div class="mb-3">
+                <label class="form-label">Benutzername <span class="text-danger">*</span></label>
+                <input type="text" name="username" class="form-control"
+                       value="<?= $val('username') ?>" required
+                       placeholder="z.B. peter.s">
+                <div class="form-text">Wird zum Einloggen verwendet. Nur Kleinbuchstaben, Punkte und Zahlen.</div>
+            </div>
+            <div class="mb-3">
                 <label class="form-label">E-Mail</label>
                 <input type="email" name="email" class="form-control"
                        value="<?= $val('email') ?>">

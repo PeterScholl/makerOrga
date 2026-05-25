@@ -29,6 +29,7 @@ class UserController extends Controller
     {
         User::create([
             'name'     => $this->clean($_POST['name'] ?? ''),
+            'username' => $this->clean($_POST['username'] ?? ''),
             'email'    => $this->clean($_POST['email'] ?? ''),
             'password' => $_POST['password'] ?? '',
             'role'     => $_POST['role'] ?? 'member',
@@ -48,9 +49,10 @@ class UserController extends Controller
     public function update(string $id): void
     {
         $data = [
-            'name'  => $this->clean($_POST['name'] ?? ''),
-            'email' => $this->clean($_POST['email'] ?? ''),
-            'role'  => $_POST['role'] ?? 'member',
+            'name'     => $this->clean($_POST['name'] ?? ''),
+            'username' => $this->clean($_POST['username'] ?? ''),
+            'email'    => $this->clean($_POST['email'] ?? ''),
+            'role'     => $_POST['role'] ?? 'member',
         ];
         // Passwort nur ändern wenn ein neues eingegeben wurde
         if (!empty($_POST['password'])) {

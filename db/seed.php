@@ -13,6 +13,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../config/database.php';
 
 $name     = 'Admin';
+$username = 'admin';
 $email    = 'admin@makerOrga.local';
 $password = 'admin123';
 
@@ -29,16 +30,17 @@ if ($existing->fetch()) {
 }
 
 $stmt = $pdo->prepare(
-    'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)'
+    'INSERT INTO users (name, username, email, password, role) VALUES (?, ?, ?, ?, ?)'
 );
 $stmt->execute([
     $name,
+    $username,
     $email,
     password_hash($password, PASSWORD_BCRYPT),
     'admin',
 ]);
 
 echo "Admin-Benutzer angelegt:\n";
-echo "  E-Mail:   $email\n";
-echo "  Passwort: $password\n";
+echo "  Benutzername: $username\n";
+echo "  Passwort:     $password\n";
 echo "\nBitte nach dem ersten Login das Passwort ändern!\n";

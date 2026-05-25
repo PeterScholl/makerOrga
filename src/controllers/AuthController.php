@@ -13,9 +13,9 @@ class AuthController extends Controller
 
     public function login(): void
     {
-        $email    = trim($_POST['email'] ?? '');
+        $username = trim($_POST['username'] ?? '');
         $password = $_POST['password'] ?? '';
-        $user     = User::findByEmail($email);
+        $user     = User::findByUsername($username);
 
         if ($user && password_verify($password, $user['password'])) {
             // Session regenerieren verhindert Session-Fixation-Angriffe

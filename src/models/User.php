@@ -14,6 +14,14 @@ class User extends Model
         return $result !== false ? $result : null;
     }
 
+    public static function findByUsername(string $username): ?array
+    {
+        $stmt = static::db()->prepare('SELECT * FROM users WHERE username = ?');
+        $stmt->execute([$username]);
+        $result = $stmt->fetch();
+        return $result !== false ? $result : null;
+    }
+
     /**
      * Passwort niemals im Klartext speichern — password_hash() erzeugt einen
      * sicheren bcrypt-Hash der nicht rückrechenbar ist.

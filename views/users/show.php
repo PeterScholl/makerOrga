@@ -16,8 +16,11 @@
             <div class="card-header fw-semibold">Profil</div>
             <div class="card-body">
                 <dl class="row mb-0">
+                    <dt class="col-sm-4">Benutzername</dt>
+                    <dd class="col-sm-8"><?= e($user['username']) ?></dd>
+
                     <dt class="col-sm-4">E-Mail</dt>
-                    <dd class="col-sm-8"><?= e($user['email']) ?></dd>
+                    <dd class="col-sm-8"><?= $user['email'] ? e($user['email']) : '<span class="text-muted">—</span>' ?></dd>
 
                     <dt class="col-sm-4">Rolle</dt>
                     <dd class="col-sm-8"><?= roleBadge($user['role']) ?></dd>
