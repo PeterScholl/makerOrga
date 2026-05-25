@@ -57,7 +57,7 @@ git commit -m "Auftragsstatus-Filter in Order::findAll() hinzugefügt"
 
 - Kurz und konkret (max. 72 Zeichen)
 - Beschreibt **was** geändert wurde, nicht warum du es gemacht hast
-- Auf Deutsch oder Englisch — Hauptsache einheitlich im Branch
+- Bevorzugt auf Deutsch alternativ Englisch — Hauptsache einheitlich im Branch
 
 ---
 

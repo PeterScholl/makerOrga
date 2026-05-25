@@ -15,6 +15,9 @@ Thumbs.db
 *.swp
 *.swo
 
+# Composer-Abhängigkeiten (werden lokal mit "composer install" generiert)
+/vendor/
+
 # Logs
 *.log
 /logs/

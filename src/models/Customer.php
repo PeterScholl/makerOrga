@@ -1,0 +1,8 @@
+<?php
+
+require_once __DIR__ . '/Model.php';
+
+class Customer extends Model
+{
+    protected static string $table = 'customers';
+}

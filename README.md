@@ -17,7 +17,7 @@ Gebaut mit **PHP** und **SQLite**, ohne externe Frameworks. Bewusst einfach geha
 
 ## Projektstruktur
 
-```
+```text
 makerOrga/
 ├── config/          # Konfiguration (Datenbankpfad, Einstellungen)
 ├── db/
@@ -52,6 +52,10 @@ makerOrga/
 git clone <repo-url> makerOrga
 cd makerOrga
 
+# Composer-Pakete installieren (einmalig nach dem Klonen nötig)
+# → was Composer ist: docs/konzepte.md
+composer install
+
 # Datenbank initialisieren (führt alle Migrationen aus)
 php db/migrate.php
 
@@ -66,6 +70,8 @@ Dann im Browser: [http://localhost:8000](http://localhost:8000)
 ## Mitentwickeln
 
 Lies zuerst [CONTRIBUTING.md](CONTRIBUTING.md) — dort steht wie wir mit Git arbeiten, wie Branches benannt werden und wie ein Pull Request aussehen soll.
+
+Begriffe wie PDO, MVC oder Migrationen werden in [docs/konzepte.md](docs/konzepte.md) erklärt.
 
 ---
 

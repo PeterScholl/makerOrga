@@ -1,0 +1,11 @@
+{
+    "name": "maker-orga/app",
+    "description": "Verwaltungssoftware für die Make & Repair AG",
+    "type": "project",
+    "require": {
+        "php": ">=8.1"
+    },
+    "autoload": {
+        "classmap": ["src/"]
+    }
+}
