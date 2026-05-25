@@ -26,7 +26,6 @@
 
 <div class="row g-4">
 
-    {{-- Auftragsdaten --}}
     <div class="col-md-6">
         <div class="card shadow-sm">
             <div class="card-header fw-semibold">Auftragsdaten</div>
@@ -86,7 +85,6 @@
         </div>
     </div>
 
-    {{-- Tätigkeiten --}}
     <div class="col-md-6">
         <div class="card shadow-sm">
             <div class="card-header fw-semibold">Tätigkeiten</div>
@@ -108,7 +106,6 @@
                     </ul>
                 <?php endif ?>
 
-                {{-- Formular: neue Tätigkeit eintragen --}}
                 <p class="fw-semibold small mb-2">Tätigkeit eintragen</p>
                 <form method="post" action="/activities">
                     <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
