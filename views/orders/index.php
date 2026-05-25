@@ -1,3 +1,4 @@
+<?php /** @var array[] $orders */ ?>
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h3 mb-0">Aufträge</h1>
     <a href="/orders/new" class="btn btn-primary">

@@ -1,3 +1,9 @@
+<?php
+/** @var array $order */
+/** @var array[] $activities */
+/** @var array[] $users */
+/** @var array[] $customers */
+?>
 <div class="d-flex justify-content-between align-items-start mb-4">
     <div>
         <a href="/orders" class="text-muted small text-decoration-none">
@@ -93,7 +99,7 @@
                     <?php foreach ($activities as $activity): ?>
                         <li class="border-bottom pb-2 mb-2">
                             <div class="d-flex justify-content-between">
-                                <strong><?= e($activity['user_name']) ?></strong>
+                                <strong><?= e($activity['user_names']) ?></strong>
                                 <small class="text-muted"><?= dateFormat($activity['worked_at'], true) ?></small>
                             </div>
                             <p class="mb-0 small"><?= nl2br(e($activity['description'])) ?></p>
@@ -108,12 +114,12 @@
                     <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
 
                     <div class="mb-2">
-                        <select name="user_id" class="form-select form-select-sm" required>
-                            <option value="">Mitarbeiter wählen …</option>
+                        <select name="user_ids[]" class="form-select form-select-sm" multiple required size="4">
                             <?php foreach ($users as $user): ?>
                             <option value="<?= $user['id'] ?>"><?= e($user['name']) ?></option>
                             <?php endforeach ?>
                         </select>
+                        <div class="form-text">Mehrere auswählbar (Strg/Cmd gedrückt halten)</div>
                     </div>
                     <div class="mb-2">
                         <input type="datetime-local" name="worked_at" class="form-control form-control-sm"

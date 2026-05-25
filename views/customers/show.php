@@ -1,3 +1,7 @@
+<?php
+/** @var array $customer */
+/** @var array[] $orders */
+?>
 <div class="d-flex justify-content-between align-items-start mb-4">
     <div>
         <a href="/customers" class="text-muted small text-decoration-none">

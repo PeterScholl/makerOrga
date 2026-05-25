@@ -5,16 +5,15 @@ class ActivityController extends Controller
     public function store(): void
     {
         $orderId = ($_POST['order_id'] ?? '') ?: null;
+        $userIds = $_POST['user_ids'] ?? [];
 
         Activity::create([
             'order_id'    => $orderId,
-            'user_id'     => (int) ($_POST['user_id'] ?? 0),
             'description' => $this->clean($_POST['description'] ?? ''),
-            // worked_at kann in der Vergangenheit liegen — Mitarbeiter trägt selbst ein
             'worked_at'   => $_POST['worked_at'] ?? date('Y-m-d H:i:s'),
+            'user_ids'    => $userIds,
         ]);
 
-        // Nach dem Speichern zurück zum Auftrag, falls vorhanden
         $redirect = $orderId ? '/orders/' . $orderId : '/orders';
         $this->redirect($redirect);
     }
@@ -22,10 +21,12 @@ class ActivityController extends Controller
     public function update(string $id): void
     {
         $activity = Activity::findById((int) $id);
-        Activity::update((int) $id, [
+        $userIds  = $_POST['user_ids'] ?? [];
+
+        Activity::updateWithUsers((int) $id, [
             'description' => $this->clean($_POST['description'] ?? ''),
             'worked_at'   => $_POST['worked_at'] ?? date('Y-m-d H:i:s'),
-        ]);
+        ], $userIds);
 
         $orderId = $activity['order_id'] ?? null;
         $this->redirect($orderId ? '/orders/' . $orderId : '/orders');
