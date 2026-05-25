@@ -23,9 +23,9 @@ $val     = fn(string $key) => e((string)($user[$key] ?? ''));
                        value="<?= $val('name') ?>" required>
             </div>
             <div class="mb-3">
-                <label class="form-label">E-Mail <span class="text-danger">*</span></label>
+                <label class="form-label">E-Mail</label>
                 <input type="email" name="email" class="form-control"
-                       value="<?= $val('email') ?>" required>
+                       value="<?= $val('email') ?>">
             </div>
             <div class="mb-3">
                 <label class="form-label">

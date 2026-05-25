@@ -29,6 +29,14 @@
                     <a class="nav-link" href="/users">Mitarbeiter</a>
                 </li>
             </ul>
+            <div class="d-flex align-items-center gap-3">
+                <span class="text-white-50 small">
+                    <?= htmlspecialchars($_SESSION['user_name'] ?? '') ?>
+                </span>
+                <form method="post" action="/logout" class="m-0">
+                    <button class="btn btn-sm btn-outline-light">Abmelden</button>
+                </form>
+            </div>
         </div>
     </div>
 </nav>

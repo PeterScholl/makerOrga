@@ -59,9 +59,14 @@ composer install
 # Datenbank initialisieren (führt alle Migrationen aus)
 php db/migrate.php
 
+# Ersten Admin-Benutzer anlegen
+php db/seed.php
+
 # Lokalen Entwicklungsserver starten
 php -S localhost:8000 -t public/
 ```
+
+Standard-Login nach `php db/seed.php`: `admin@makerOrga.local` / `admin123`
 
 Dann im Browser: [http://localhost:8000](http://localhost:8000)
 

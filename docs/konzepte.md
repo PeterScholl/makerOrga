@@ -246,6 +246,79 @@ In jedem Controller sieht das so aus: `store()` und `update()` enden immer mit `
 
 ---
 
+## Authentifizierung und Sessions
+
+**Authentifizierung** bedeutet: Wer bist du? Die App prüft ob jemand wirklich der ist, der er behauptet zu sein — meistens über E-Mail und Passwort.
+
+Das ist etwas anderes als **Autorisierung** (was darf jemand tun?). Beides ist wichtig, aber Authentifizierung kommt zuerst.
+
+---
+
+### Wie eine Session funktioniert
+
+HTTP ist zustandslos — jede Anfrage ist für den Server ein Neuanfang, er erinnert sich an nichts. Eine **Session** löst das Problem: Der Server legt beim Login eine kleine Datei an und schickt dem Browser eine zufällige ID als Cookie zurück. Bei jeder weiteren Anfrage schickt der Browser diese ID mit, und der Server weiß: "Ah, das ist Peter."
+
+```text
+1. Browser: POST /login  (E-Mail + Passwort)
+2. Server:  Passwort korrekt → Session anlegen, Cookie mit Session-ID senden
+3. Browser: GET /orders  (Cookie wird automatisch mitgeschickt)
+4. Server:  Session-ID aus Cookie lesen → weiß wer eingeloggt ist
+```
+
+In PHP wird eine Session mit `session_start()` gestartet. Danach kann man Daten darin speichern:
+
+```php
+$_SESSION['user_id']   = 42;       // Wir merken uns wer eingeloggt ist
+$_SESSION['user_name'] = 'Peter';
+```
+
+Und beim Abmelden wird die Session gelöscht:
+
+```php
+session_destroy();
+```
+
+---
+
+### Zugriffsschutz in diesem Projekt
+
+In `public/index.php` prüfen wir bei jeder Anfrage ob eine Session existiert. Wenn nicht, landet man auf der Login-Seite:
+
+```php
+if (!in_array($currentPath, $publicRoutes) && !isset($_SESSION['user_id'])) {
+    header('Location: /login');
+    exit;
+}
+```
+
+Diese Prüfung passiert *bevor* der Router die Anfrage an einen Controller weitergibt — so ist kein einziger Controller ohne Login erreichbar.
+
+---
+
+### Passwörter niemals im Klartext speichern
+
+Passwörter werden nie direkt in der Datenbank gespeichert. Stattdessen wird ein **Hash** gespeichert — ein Fingerabdruck des Passworts der sich nicht rückrechnen lässt:
+
+```php
+// Beim Anlegen eines Benutzers:
+$hash = password_hash('meinPasswort', PASSWORD_BCRYPT);
+// $hash sieht z.B. so aus: $2y$10$abcdefgh...
+
+// Beim Login:
+password_verify('meinPasswort', $hash);  // → true
+password_verify('falschesPasswort', $hash);  // → false
+```
+
+Selbst wenn jemand die Datenbank stiehlt, kann er die Passwörter nicht lesen.
+
+---
+
+### Session-Regenerierung
+
+Nach einem erfolgreichen Login rufen wir `session_regenerate_id(true)` auf. Das klingt technisch, hat aber einen wichtigen Grund: Es verhindert **Session-Fixation** — einen Angriff bei dem jemand eine fremde Session-ID einschleust und dann nach dem Login dieselbe ID übernimmt. Durch die Regenerierung bekommt der eingeloggte Benutzer eine neue, unvorhersehbare ID.
+
+---
+
 ## .htaccess und der `public/`-Ordner
 
 Nur der Ordner `public/` ist vom Webserver erreichbar. Alle anderen Ordner (`src/`, `config/`, `db/`) liegen außerhalb des Web-Roots und können nicht direkt über den Browser aufgerufen werden.
