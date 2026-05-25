@@ -1,8 +1,9 @@
 <?php
 // $order ist null beim Anlegen, ein Array beim Bearbeiten
-$isEdit  = $order !== null;
-$action  = $isEdit ? '/orders/' . $order['id'] : '/orders';
-$heading = $isEdit ? 'Auftrag bearbeiten' : 'Neuer Auftrag';
+$isEdit    = $order !== null;
+$action    = $isEdit ? '/orders/' . $order['id'] : '/orders';
+$heading   = $isEdit ? 'Auftrag bearbeiten' : 'Neuer Auftrag';
+$canAssign = in_array($_SESSION['user_role'] ?? '', ['admin', 'coordinator'], true);
 
 // Hilfsfunktion: gibt gespeicherten Wert oder Fallback zurück
 $val = fn(string $key, string $default = '') => e((string)($order[$key] ?? $default));
@@ -55,6 +56,7 @@ $val = fn(string $key, string $default = '') => e((string)($order[$key] ?? $defa
             </div>
 
             <div class="row g-3 mb-3">
+                <?php if ($canAssign): ?>
                 <div class="col-sm-6">
                     <label class="form-label">Kunde</label>
                     <select name="customer_id" class="form-select">
@@ -79,6 +81,16 @@ $val = fn(string $key, string $default = '') => e((string)($order[$key] ?? $defa
                         <?php endforeach ?>
                     </select>
                 </div>
+                <?php else: ?>
+                <div class="col-sm-6">
+                    <label class="form-label">Kunde</label>
+                    <p class="form-control-plaintext"><?= e($order['customer_name'] ?? '—') ?></p>
+                </div>
+                <div class="col-sm-6">
+                    <label class="form-label">Zugewiesener Mitarbeiter</label>
+                    <p class="form-control-plaintext"><?= e($order['assigned_user_name'] ?? '—') ?></p>
+                </div>
+                <?php endif ?>
             </div>
 
             <div class="mb-3">

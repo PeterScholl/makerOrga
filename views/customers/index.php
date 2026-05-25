@@ -1,9 +1,11 @@
 <?php /** @var array[] $customers */ ?>
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h3 mb-0">Kunden</h1>
+    <?php if (in_array($_SESSION['user_role'] ?? '', ['admin', 'coordinator'], true)): ?>
     <a href="/customers/new" class="btn btn-primary">
         <i class="bi bi-plus-lg"></i> Neuer Kunde
     </a>
+    <?php endif ?>
 </div>
 
 <?php if (empty($customers)): ?>
@@ -30,9 +32,11 @@
                 <td><?= e($customer['email'] ?? '—') ?></td>
                 <td><?= e($customer['phone'] ?? '—') ?></td>
                 <td>
+                    <?php if (in_array($_SESSION['user_role'] ?? '', ['admin', 'coordinator'], true)): ?>
                     <a href="/customers/<?= $customer['id'] ?>/edit" class="btn btn-sm btn-outline-secondary">
                         <i class="bi bi-pencil"></i>
                     </a>
+                    <?php endif ?>
                 </td>
             </tr>
             <?php endforeach ?>

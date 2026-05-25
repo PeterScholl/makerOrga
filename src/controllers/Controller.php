@@ -47,4 +47,36 @@ abstract class Controller
         $value = trim($value);
         return $value !== '' ? $value : null;
     }
+
+    /**
+     * Zugriff verweigern wenn der aktuelle Benutzer keine der erlaubten Rollen hat.
+     * Erlaubte Rollen: 'admin', 'coordinator', 'member'
+     */
+    protected function requireRole(string ...$roles): void
+    {
+        if (!in_array($this->currentRole(), $roles, true)) {
+            $this->forbidden();
+        }
+    }
+
+    // Gibt HTTP 403 zurück und beendet die Ausführung.
+    protected function forbidden(): never
+    {
+        http_response_code(403);
+        $content = '<div class="alert alert-danger mt-3">
+            <strong>Kein Zugriff.</strong> Du hast keine Berechtigung für diese Aktion.
+        </div>';
+        require __DIR__ . '/../../views/layout/main.php';
+        exit;
+    }
+
+    protected function currentRole(): string
+    {
+        return $_SESSION['user_role'] ?? '';
+    }
+
+    protected function currentUserId(): int
+    {
+        return (int) ($_SESSION['user_id'] ?? 0);
+    }
 }

@@ -1,8 +1,10 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h3 mb-0">Mitarbeiter</h1>
+    <?php if (($_SESSION['user_role'] ?? '') === 'admin'): ?>
     <a href="/users/new" class="btn btn-primary">
         <i class="bi bi-plus-lg"></i> Neuer Mitarbeiter
     </a>
+    <?php endif ?>
 </div>
 
 <?php if (empty($users)): ?>
@@ -29,9 +31,11 @@
                 <td><?= e($user['email']) ?></td>
                 <td><?= roleBadge($user['role']) ?></td>
                 <td>
+                    <?php if (($_SESSION['user_role'] ?? '') === 'admin'): ?>
                     <a href="/users/<?= $user['id'] ?>/edit" class="btn btn-sm btn-outline-secondary">
                         <i class="bi bi-pencil"></i>
                     </a>
+                    <?php endif ?>
                 </td>
             </tr>
             <?php endforeach ?>

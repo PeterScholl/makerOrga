@@ -3,6 +3,7 @@ $isEdit  = $customer !== null;
 $action  = $isEdit ? '/customers/' . $customer['id'] : '/customers';
 $heading = $isEdit ? 'Kunde bearbeiten' : 'Neuer Kunde';
 $val     = fn(string $key) => e((string)($customer[$key] ?? ''));
+$isAdmin = ($_SESSION['user_role'] ?? '') === 'admin';
 ?>
 
 <div class="mb-4">
@@ -23,14 +24,24 @@ $val     = fn(string $key) => e((string)($customer[$key] ?? ''));
                        value="<?= $val('name') ?>" required>
             </div>
             <div class="mb-3">
-                <label class="form-label">E-Mail</label>
+                <label class="form-label">E-Mail
+                    <?php if (!$isAdmin): ?>
+                        <span class="text-muted fw-normal small">(nur Admin kann dies ändern)</span>
+                    <?php endif ?>
+                </label>
                 <input type="email" name="email" class="form-control"
-                       value="<?= $val('email') ?>">
+                       value="<?= $val('email') ?>"
+                       <?= $isAdmin ? '' : 'disabled' ?>>
             </div>
             <div class="mb-3">
-                <label class="form-label">Telefon</label>
+                <label class="form-label">Telefon
+                    <?php if (!$isAdmin): ?>
+                        <span class="text-muted fw-normal small">(nur Admin kann dies ändern)</span>
+                    <?php endif ?>
+                </label>
                 <input type="tel" name="phone" class="form-control"
-                       value="<?= $val('phone') ?>">
+                       value="<?= $val('phone') ?>"
+                       <?= $isAdmin ? '' : 'disabled' ?>>
             </div>
             <div class="mb-3">
                 <label class="form-label">Interne Notizen</label>

@@ -22,11 +22,13 @@ class UserController extends Controller
 
     public function create(): void
     {
+        $this->requireRole('admin');
         $this->render('users/form', ['user' => null]);
     }
 
     public function store(): void
     {
+        $this->requireRole('admin');
         User::create([
             'name'     => $this->clean($_POST['name'] ?? ''),
             'username' => $this->clean($_POST['username'] ?? ''),
@@ -39,6 +41,7 @@ class UserController extends Controller
 
     public function edit(string $id): void
     {
+        $this->requireRole('admin');
         $user = User::findById((int) $id);
         if (!$user) {
             $this->redirect('/users');
@@ -48,6 +51,7 @@ class UserController extends Controller
 
     public function update(string $id): void
     {
+        $this->requireRole('admin');
         $data = [
             'name'     => $this->clean($_POST['name'] ?? ''),
             'username' => $this->clean($_POST['username'] ?? ''),

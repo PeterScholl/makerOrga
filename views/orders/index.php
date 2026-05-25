@@ -1,9 +1,11 @@
 <?php /** @var array[] $orders */ ?>
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h3 mb-0">Aufträge</h1>
+    <?php if (in_array($_SESSION['user_role'] ?? '', ['admin', 'coordinator'], true)): ?>
     <a href="/orders/new" class="btn btn-primary">
         <i class="bi bi-plus-lg"></i> Neuer Auftrag
     </a>
+    <?php endif ?>
 </div>
 
 <?php if (empty($orders)): ?>
@@ -38,9 +40,17 @@
                 <td><?= htmlspecialchars($order['assigned_user_name'] ?? '—') ?></td>
                 <td><?= dateFormat($order['received_at']) ?></td>
                 <td>
+                    <?php
+                    $role    = $_SESSION['user_role'] ?? '';
+                    $uid     = (int)($_SESSION['user_id'] ?? 0);
+                    $canEdit = in_array($role, ['admin', 'coordinator'], true)
+                            || ($role === 'member' && $uid === (int)$order['assigned_user_id']);
+                    ?>
+                    <?php if ($canEdit): ?>
                     <a href="/orders/<?= $order['id'] ?>/edit" class="btn btn-sm btn-outline-secondary">
                         <i class="bi bi-pencil"></i>
                     </a>
+                    <?php endif ?>
                 </td>
             </tr>
             <?php endforeach ?>

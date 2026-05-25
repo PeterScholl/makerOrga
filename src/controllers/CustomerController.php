@@ -23,22 +23,29 @@ class CustomerController extends Controller
 
     public function create(): void
     {
+        $this->requireRole('admin', 'coordinator');
         $this->render('customers/form', ['customer' => null]);
     }
 
     public function store(): void
     {
-        Customer::create([
+        $this->requireRole('admin', 'coordinator');
+        $data = [
             'name'  => $this->clean($_POST['name'] ?? ''),
-            'email' => $this->clean($_POST['email'] ?? ''),
-            'phone' => $this->clean($_POST['phone'] ?? ''),
             'notes' => $this->clean($_POST['notes'] ?? ''),
-        ]);
+        ];
+        // E-Mail und Telefon darf nur der Admin beim Anlegen setzen
+        if ($this->currentRole() === 'admin') {
+            $data['email'] = $this->clean($_POST['email'] ?? '');
+            $data['phone'] = $this->clean($_POST['phone'] ?? '');
+        }
+        Customer::create($data);
         $this->redirect('/customers');
     }
 
     public function edit(string $id): void
     {
+        $this->requireRole('admin', 'coordinator');
         $customer = Customer::findById((int) $id);
         if (!$customer) {
             $this->redirect('/customers');
@@ -48,12 +55,17 @@ class CustomerController extends Controller
 
     public function update(string $id): void
     {
-        Customer::update((int) $id, [
+        $this->requireRole('admin', 'coordinator');
+        $data = [
             'name'  => $this->clean($_POST['name'] ?? ''),
-            'email' => $this->clean($_POST['email'] ?? ''),
-            'phone' => $this->clean($_POST['phone'] ?? ''),
             'notes' => $this->clean($_POST['notes'] ?? ''),
-        ]);
+        ];
+        // E-Mail und Telefon darf nur der Admin ändern
+        if ($this->currentRole() === 'admin') {
+            $data['email'] = $this->clean($_POST['email'] ?? '');
+            $data['phone'] = $this->clean($_POST['phone'] ?? '');
+        }
+        Customer::update((int) $id, $data);
         $this->redirect('/customers/' . $id);
     }
 }
