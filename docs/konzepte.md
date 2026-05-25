@@ -248,9 +248,9 @@ In jedem Controller sieht das so aus: `store()` und `update()` enden immer mit `
 
 ## Authentifizierung und Sessions
 
-**Authentifizierung** bedeutet: Wer bist du? Die App prüft ob jemand wirklich der ist, der er behauptet zu sein — meistens über E-Mail und Passwort.
+**Authentifizierung** bedeutet: Wer bist du? Die App prüft ob jemand wirklich der ist, der er behauptet zu sein — meistens über Benutzername und Passwort.
 
-Das ist etwas anderes als **Autorisierung** (was darf jemand tun?). Beides ist wichtig, aber Authentifizierung kommt zuerst.
+Das ist etwas anderes als **Autorisierung** (was darf jemand tun?). Beides ist wichtig, aber Authentifizierung kommt zuerst — man muss wissen wer jemand ist, bevor man entscheiden kann was er darf.
 
 ---
 
@@ -316,6 +316,93 @@ Selbst wenn jemand die Datenbank stiehlt, kann er die Passwörter nicht lesen.
 ### Session-Regenerierung
 
 Nach einem erfolgreichen Login rufen wir `session_regenerate_id(true)` auf. Das klingt technisch, hat aber einen wichtigen Grund: Es verhindert **Session-Fixation** — einen Angriff bei dem jemand eine fremde Session-ID einschleust und dann nach dem Login dieselbe ID übernimmt. Durch die Regenerierung bekommt der eingeloggte Benutzer eine neue, unvorhersehbare ID.
+
+---
+
+## Autorisierung und Rollen
+
+Autorisierung beantwortet die Frage: Was darf dieser Benutzer tun?
+
+In diesem Projekt gibt es drei Rollen — `admin`, `coordinator` und `member` — die in der Datenbank pro Benutzer gespeichert sind. Nach dem Login wird die Rolle in der Session gemerkt:
+
+```php
+$_SESSION['user_role'] = $user['role'];  // z.B. 'admin'
+```
+
+Ab diesem Moment ist die Rolle bei jeder Anfrage bekannt und kann geprüft werden.
+
+---
+
+### Wie `requireRole()` funktioniert
+
+Die Basisklasse `Controller` stellt eine Methode bereit, die den Zugriff auf eine Controller-Methode einschränkt:
+
+```php
+// Nur Admins dürfen weiter — alle anderen bekommen HTTP 403
+$this->requireRole('admin');
+
+// Admin oder Koordinator dürfen weiter
+$this->requireRole('admin', 'coordinator');
+```
+
+Ist die Rolle des aktuellen Benutzers nicht in der Liste, wird sofort eine Fehlerseite ausgegeben und die Ausführung beendet. Der eigentliche Code dahinter wird nie erreicht.
+
+Das sieht in einem Controller dann so aus:
+
+```php
+public function edit(string $id): void
+{
+    $this->requireRole('admin');   // ← Zugriffsschutz, erste Zeile
+    $user = User::findById((int) $id);
+    // ...
+}
+```
+
+**Wichtig:** Der Schutz sitzt im Controller, nicht in der View. Views können Buttons ausblenden — aber das ist nur Komfort. Ein technisch versierter Benutzer könnte die URL trotzdem manuell aufrufen. Deswegen muss die echte Prüfung immer serverseitig im Controller stattfinden.
+
+---
+
+### Bereichsabhängige Prüfungen
+
+Manchmal reicht eine einfache Rollenprüfung nicht aus. Bei Aufträgen gilt z.B.: Ein Mitarbeiter darf einen Auftrag nur bearbeiten wenn er ihm zugewiesen ist. Das prüft der Controller anhand konkreter Daten:
+
+```php
+private function canEditOrder(array $order): bool
+{
+    // Admin und Koordinator dürfen immer
+    if (in_array($this->currentRole(), ['admin', 'coordinator'], true)) {
+        return true;
+    }
+    // Mitarbeiter nur wenn er der Zugewiesene ist
+    return $this->currentRole() === 'member'
+        && $this->currentUserId() === (int) $order['assigned_user_id'];
+}
+```
+
+---
+
+### Feldbasierte Einschränkungen
+
+Manchmal darf jemand zwar ein Formular ausfüllen, aber nicht alle Felder ändern. Dann hilft es nicht, das Feld nur im HTML auszublenden — `disabled`-Felder werden vom Browser nicht mitgeschickt, aber jemand könnte das Formular trotzdem manuell mit dem fehlenden Feld abschicken.
+
+Die Lösung: Im Controller wird geprüft welche Felder der aktuelle Benutzer ändern darf, und nur diese werden gespeichert:
+
+```php
+$data = ['name' => ..., 'notes' => ...];  // darf jeder Koordinator ändern
+
+if ($this->currentRole() === 'admin') {
+    $data['email'] = ...;   // nur Admin darf E-Mail und Telefon ändern
+    $data['phone'] = ...;
+}
+
+Customer::update((int) $id, $data);
+```
+
+Schickt ein Koordinator trotzdem ein `email`-Feld mit — es wird schlicht ignoriert.
+
+---
+
+Die vollständige Tabelle wer was darf steht in [docs/berechtigungen.md](berechtigungen.md).
 
 ---
 
