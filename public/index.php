@@ -2,6 +2,7 @@
 
 // Autoloader einbinden — macht alle Klassen aus src/ verfügbar
 require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../src/helpers.php';
 
 $router = new Router();
 

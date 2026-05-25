@@ -1,0 +1,133 @@
+<div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+        <a href="/orders" class="text-muted small text-decoration-none">
+            <i class="bi bi-arrow-left"></i> Zurück zur Liste
+        </a>
+        <h1 class="h3 mt-1"><?= e($order['title']) ?></h1>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="/orders/<?= $order['id'] ?>/edit" class="btn btn-outline-secondary">
+            <i class="bi bi-pencil"></i> Bearbeiten
+        </a>
+        <form method="post" action="/orders/<?= $order['id'] ?>/delete"
+              data-confirm="Auftrag wirklich löschen?">
+            <button class="btn btn-outline-danger">
+                <i class="bi bi-trash"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="row g-4">
+
+    {{-- Auftragsdaten --}}
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header fw-semibold">Auftragsdaten</div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Typ</dt>
+                    <dd class="col-sm-8"><?= $order['type'] === 'repair' ? 'Reparatur' : 'Projekt' ?></dd>
+
+                    <dt class="col-sm-4">Status</dt>
+                    <dd class="col-sm-8"><?= statusBadge($order['status']) ?></dd>
+
+                    <dt class="col-sm-4">Priorität</dt>
+                    <dd class="col-sm-8"><?= priorityBadge($order['priority']) ?></dd>
+
+                    <dt class="col-sm-4">Abgabe</dt>
+                    <dd class="col-sm-8"><?= dateFormat($order['received_at']) ?></dd>
+
+                    <?php if ($order['completed_at']): ?>
+                    <dt class="col-sm-4">Abschluss</dt>
+                    <dd class="col-sm-8"><?= dateFormat($order['completed_at']) ?></dd>
+                    <?php endif ?>
+
+                    <dt class="col-sm-4">Rückgabe</dt>
+                    <dd class="col-sm-8">
+                        <?= $order['returned'] ? '<span class="text-success"><i class="bi bi-check-circle"></i> Zurückgegeben</span>'
+                                               : '<span class="text-muted">Noch nicht zurückgegeben</span>' ?>
+                    </dd>
+
+                    <?php if ($order['device_info']): ?>
+                    <dt class="col-sm-4">Gerät</dt>
+                    <dd class="col-sm-8"><?= e($order['device_info']) ?></dd>
+                    <?php endif ?>
+
+                    <?php if ($order['customer_name']): ?>
+                    <dt class="col-sm-4">Kunde</dt>
+                    <dd class="col-sm-8"><?= e($order['customer_name']) ?></dd>
+                    <?php endif ?>
+
+                    <?php if ($order['assigned_user_name']): ?>
+                    <dt class="col-sm-4">Mitarbeiter</dt>
+                    <dd class="col-sm-8"><?= e($order['assigned_user_name']) ?></dd>
+                    <?php endif ?>
+                </dl>
+
+                <?php if ($order['description']): ?>
+                <hr>
+                <p class="mb-0 text-muted small">Beschreibung</p>
+                <p class="mb-0"><?= nl2br(e($order['description'])) ?></p>
+                <?php endif ?>
+
+                <?php if ($order['result']): ?>
+                <hr>
+                <p class="mb-0 text-muted small">Ergebnis</p>
+                <p class="mb-0"><?= nl2br(e($order['result'])) ?></p>
+                <?php endif ?>
+            </div>
+        </div>
+    </div>
+
+    {{-- Tätigkeiten --}}
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header fw-semibold">Tätigkeiten</div>
+            <div class="card-body">
+
+                <?php if (empty($activities)): ?>
+                    <p class="text-muted small">Noch keine Tätigkeiten eingetragen.</p>
+                <?php else: ?>
+                    <ul class="list-unstyled mb-4">
+                    <?php foreach ($activities as $activity): ?>
+                        <li class="border-bottom pb-2 mb-2">
+                            <div class="d-flex justify-content-between">
+                                <strong><?= e($activity['user_name']) ?></strong>
+                                <small class="text-muted"><?= dateFormat($activity['worked_at'], true) ?></small>
+                            </div>
+                            <p class="mb-0 small"><?= nl2br(e($activity['description'])) ?></p>
+                        </li>
+                    <?php endforeach ?>
+                    </ul>
+                <?php endif ?>
+
+                {{-- Formular: neue Tätigkeit eintragen --}}
+                <p class="fw-semibold small mb-2">Tätigkeit eintragen</p>
+                <form method="post" action="/activities">
+                    <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
+
+                    <div class="mb-2">
+                        <select name="user_id" class="form-select form-select-sm" required>
+                            <option value="">Mitarbeiter wählen …</option>
+                            <?php foreach ($users as $user): ?>
+                            <option value="<?= $user['id'] ?>"><?= e($user['name']) ?></option>
+                            <?php endforeach ?>
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <input type="datetime-local" name="worked_at" class="form-control form-control-sm"
+                               value="<?= date('Y-m-d\TH:i') ?>" required>
+                    </div>
+                    <div class="mb-2">
+                        <textarea name="description" class="form-control form-control-sm"
+                                  rows="2" placeholder="Was wurde gemacht?" required></textarea>
+                    </div>
+                    <button class="btn btn-sm btn-primary">Eintragen</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+</div>

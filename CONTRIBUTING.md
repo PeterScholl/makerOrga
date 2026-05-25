@@ -80,9 +80,25 @@ Der PR wird dann angeschaut, kommentiert und schließlich in `main` gemergt.
 
 ---
 
+## Neue Klasse angelegt? Autoloader aktualisieren
+
+Wer eine neue PHP-Klasse in `src/` erstellt, muss danach einmal ausführen:
+
+```bash
+composer dump-autoload
+```
+
+Sonst findet der Editor (und zur Laufzeit PHP selbst) die Klasse nicht.  
+Faustregel: neue Datei in `src/` → `composer dump-autoload`.
+
+---
+
 ## Vor dem PR: kurz testen
 
 ```bash
+# Autoloader aktualisieren (falls neue Klassen dazugekommen sind)
+composer dump-autoload
+
 # Migrationen laufen lassen (falls du DB-Änderungen hast)
 php db/migrate.php
 

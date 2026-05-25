@@ -7,7 +7,8 @@
       "Bash(php -l /home/peter/skripte/makerOrga/src/controllers/OrderController.php)",
       "Bash(php -l /home/peter/skripte/makerOrga/src/controllers/CustomerController.php)",
       "Bash(php -l /home/peter/skripte/makerOrga/src/controllers/UserController.php)",
-      "Bash(php -l /home/peter/skripte/makerOrga/src/controllers/ActivityController.php)"
+      "Bash(php -l /home/peter/skripte/makerOrga/src/controllers/ActivityController.php)",
+      "Bash(composer dump-autoload *)"
     ]
   }
 }
