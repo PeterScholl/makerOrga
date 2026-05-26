@@ -24,24 +24,14 @@ $isAdmin = ($_SESSION['user_role'] ?? '') === 'admin';
                        value="<?= $val('name') ?>" required>
             </div>
             <div class="mb-3">
-                <label class="form-label">E-Mail
-                    <?php if (!$isAdmin): ?>
-                        <span class="text-muted fw-normal small">(nur Admin kann dies ändern)</span>
-                    <?php endif ?>
-                </label>
+                <label class="form-label">E-Mail</label>
                 <input type="email" name="email" class="form-control"
-                       value="<?= $val('email') ?>"
-                       <?= $isAdmin ? '' : 'disabled' ?>>
+                       value="<?= $val('email') ?>">
             </div>
             <div class="mb-3">
-                <label class="form-label">Telefon
-                    <?php if (!$isAdmin): ?>
-                        <span class="text-muted fw-normal small">(nur Admin kann dies ändern)</span>
-                    <?php endif ?>
-                </label>
+                <label class="form-label">Telefon</label>
                 <input type="tel" name="phone" class="form-control"
-                       value="<?= $val('phone') ?>"
-                       <?= $isAdmin ? '' : 'disabled' ?>>
+                       value="<?= $val('phone') ?>">
             </div>
             <div class="mb-3">
                 <label class="form-label">Interne Notizen</label>
