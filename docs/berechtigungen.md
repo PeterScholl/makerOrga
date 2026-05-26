@@ -43,10 +43,8 @@ Kundenzuweisung, Mitarbeiterzuweisung.
 | Kunden anzeigen | ✓ | ✓ | ✓ |
 | Neuen Kunden anlegen | ✓ | ✓ | — |
 | Name und Notizen bearbeiten | ✓ | ✓ | — |
-| E-Mail bearbeiten | ✓ | — | — |
-| Telefon bearbeiten | ✓ | — | — |
-
-**Hintergrund:** E-Mail und Telefon sind Kontaktdaten die beim Benachrichtigen von Kunden verwendet werden. Damit diese nicht versehentlich geändert werden, sind sie dem Admin vorbehalten.
+| E-Mail bearbeiten | ✓ | ✓ | — |
+| Telefon bearbeiten | ✓ | ✓ | — |
 
 ---
 
