@@ -182,7 +182,7 @@ Der fertige HTML-Code wird an den Browser geschickt. Der Nutzer sieht die Auftra
 ```text
 Browser  →  Router  →  Controller  →  Model  →  Datenbank
                     ←              ←         ←
-                         View (HTML)
+               View (HTML)
                     ↓
                  Browser
 ```
