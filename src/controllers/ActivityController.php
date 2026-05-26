@@ -18,15 +18,35 @@ class ActivityController extends Controller
         $this->redirect($redirect);
     }
 
+    public function edit(string $id): void
+    {
+        $activity = Activity::findById((int) $id);
+        if (!$activity || !Activity::isEditable($activity, $this->currentUserId(), $this->currentRole())) {
+            $this->forbidden();
+        }
+        $canEditAll = in_array($this->currentRole(), ['admin', 'coordinator'], true);
+        $users      = $canEditAll ? User::findAllSorted() : [];
+        $assigned   = Activity::getUserIds((int) $id);
+        $this->render('activities/form', compact('activity', 'users', 'assigned', 'canEditAll'));
+    }
+
     public function update(string $id): void
     {
         $activity = Activity::findById((int) $id);
-        $userIds  = $_POST['user_ids'] ?? [];
+        if (!$activity || !Activity::isEditable($activity, $this->currentUserId(), $this->currentRole())) {
+            $this->forbidden();
+        }
 
-        Activity::updateWithUsers((int) $id, [
-            'description' => $this->clean($_POST['description'] ?? ''),
-            'worked_at'   => $_POST['worked_at'] ?? date('Y-m-d H:i:s'),
-        ], $userIds);
+        $canEditAll = in_array($this->currentRole(), ['admin', 'coordinator'], true);
+        $data       = ['description' => $this->clean($_POST['description'] ?? '')];
+
+        if ($canEditAll) {
+            $data['worked_at'] = $_POST['worked_at'] ?? $activity['worked_at'];
+            $userIds = array_values(array_unique(array_filter($_POST['user_ids'] ?? [])));
+            Activity::updateWithUsers((int) $id, $data, $userIds);
+        } else {
+            Activity::update((int) $id, $data);
+        }
 
         $orderId = $activity['order_id'] ?? null;
         $this->redirect($orderId ? '/orders/' . $orderId : '/orders');
@@ -35,7 +55,10 @@ class ActivityController extends Controller
     public function destroy(string $id): void
     {
         $activity = Activity::findById((int) $id);
-        $orderId  = $activity['order_id'] ?? null;
+        if (!$activity || !Activity::isEditable($activity, $this->currentUserId(), $this->currentRole())) {
+            $this->forbidden();
+        }
+        $orderId = $activity['order_id'] ?? null;
         Activity::delete((int) $id);
         $this->redirect($orderId ? '/orders/' . $orderId : '/orders');
     }

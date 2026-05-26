@@ -95,12 +95,29 @@
                 <?php else: ?>
                     <ul class="list-unstyled mb-4">
                     <?php foreach ($activities as $activity): ?>
+                        <?php $canEdit = in_array($activity['id'], $editableActivityIds, false); ?>
                         <li class="border-bottom pb-2 mb-2">
-                            <div class="d-flex justify-content-between">
-                                <strong><?= e($activity['user_names']) ?></strong>
-                                <small class="text-muted"><?= dateFormat($activity['worked_at'], true) ?></small>
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong><?= e($activity['user_names']) ?></strong>
+                                    <small class="text-muted ms-2"><?= dateFormat($activity['worked_at'], true) ?></small>
+                                </div>
+                                <?php if ($canEdit): ?>
+                                <div class="d-flex gap-1">
+                                    <a href="/activities/<?= $activity['id'] ?>/edit"
+                                       class="btn btn-sm btn-outline-secondary py-0 px-1">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form method="post" action="/activities/<?= $activity['id'] ?>/delete"
+                                          data-confirm="Tätigkeit wirklich löschen?">
+                                        <button class="btn btn-sm btn-outline-danger py-0 px-1">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                                <?php endif ?>
                             </div>
-                            <p class="mb-0 small"><?= nl2br(e($activity['description'])) ?></p>
+                            <p class="mb-0 small mt-1"><?= nl2br(e($activity['description'])) ?></p>
                         </li>
                     <?php endforeach ?>
                     </ul>
