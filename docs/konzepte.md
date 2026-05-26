@@ -70,7 +70,7 @@ composer install
 Das ist vergleichbar mit `npm install` in JavaScript-Projekten.
 
 **Was `vendor/` enthält:**  
-Alle heruntergeladenen Pakete — und eine wichtige Datei: `vendor/autoload.php`. Diese eine Datei lädt man am Anfang des Programms ein, und danach sind alle Klassen aus allen Paketen automatisch verfügbar. In diesem Projekt nutzen wir das auch für unsere eigenen Klassen (siehe [Autoloader](#singleton-muster)).
+Alle heruntergeladenen Pakete — und eine wichtige Datei: `vendor/autoload.php`. Diese eine Datei lädt man am Anfang des Programms ein, und danach sind alle Klassen aus allen Paketen automatisch verfügbar. In diesem Projekt nutzen wir das auch für unsere eigenen Klassen — wie das funktioniert zeigt der nächste Abschnitt.
 
 **Was `composer.json` in diesem Projekt macht:**  
 Aktuell haben wir keine externen Pakete. Wir nutzen Composer nur damit die Entwicklungsumgebung (der Code-Editor) unsere eigenen Klassen findet und keine falschen Fehlermeldungen anzeigt:
@@ -169,22 +169,36 @@ public static function findById(int $id): ?array
 ```
 
 **4. View** — `views/orders/show.php`  
-Die View bekommt die Daten als PHP-Variablen und baut daraus HTML. Sie enthält keine Datenbankaufrufe:
+Die (oder der) View ist der Programmteil der ausschließlich für die Darstellung zuständig ist. Sie bekommt die Auftragsdaten fertig aufbereitet als PHP-Variablen übergeben und baut daraus HTML: Titel des Auftrags als Überschrift, Status als farbiges Badge, Beschreibung als Fließtext usw. Woher die Daten kommen oder wie sie in der Datenbank gespeichert sind, interessiert sie nicht:
 
 ```php
 <h1><?= e($order['title']) ?></h1>
 <p>Status: <?= statusBadge($order['status']) ?></p>
 ```
 
-**5. Antwort ans Browser**  
+**5. Antwort an den Browser**  
 Der fertige HTML-Code wird an den Browser geschickt. Der Nutzer sieht die Auftragsseite.
 
+**Gesamtablauf der Anfrage:**
+
 ```text
-Browser  →  Router  →  Controller  →  Model  →  Datenbank
-                    ←              ←         ←
-               View (HTML)
-                    ↓
-                 Browser
+Browser       sendet GET /orders/42
+  ↓
+Router        erkennt /orders/{id}, wählt OrderController::show(42) aus
+  ↓
+Controller    fragt das Model nach Auftrag 42 und seinen Tätigkeiten
+  ↓
+Model         baut SQL-Abfragen zusammen, schickt sie an die Datenbank
+  ↓
+Datenbank     führt SQL aus, liefert Datensätze zurück an das Model
+  ↓
+Model         gibt die Daten als PHP-Array an den Controller zurück
+  ↓
+Controller    übergibt alle Daten ($order, $activities …) an die View
+  ↓
+View          empfängt die Daten vom Controller, baut HTML daraus zusammen
+  ↓
+Browser       zeigt das fertige HTML an
 ```
 
 ---

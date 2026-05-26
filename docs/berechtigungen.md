@@ -75,3 +75,58 @@ Die Zugriffsregeln sitzen in den Controllern, nicht in den Views. Views blenden 
 | `src/controllers/UserController.php` | `create`, `store`, `edit`, `update` → nur `admin` |
 | `src/controllers/OrderController.php` | `create`, `store` → `admin`/`coordinator`; `edit`, `update` → `canEditOrder()`; `destroy` → nur `admin` |
 | `src/controllers/CustomerController.php` | `create`, `store`, `edit`, `update` → `admin`/`coordinator`; E-Mail/Telefon in `store`/`update` → nur `admin` |
+| `src/controllers/ActivityController.php` | `edit`, `update`, `destroy` → `Activity::isEditable()` |
+
+### Wie weiß der Controller wer gerade angemeldet ist?
+
+Beim Login speichert der Server ID und Rolle des Benutzers in der **Session**:
+
+```php
+$_SESSION['user_id']   = $user['id'];    // z.B. 5
+$_SESSION['user_role'] = $user['role'];  // z.B. 'member'
+```
+
+Bei jeder weiteren Anfrage schickt der Browser seinen Session-Cookie mit — der Server liest daraus `$_SESSION` aus und weiß sofort, wer die Anfrage stellt. **Kein Datenbankzugriff nötig**, um die Identität des Benutzers festzustellen. Die Basisklasse `Controller` macht beides als Hilfsmethoden verfügbar:
+
+```php
+$this->currentUserId();   // liest $_SESSION['user_id']
+$this->currentRole();     // liest $_SESSION['user_role']
+```
+
+### Beispiel: Mitarbeiter will einen Tätigkeitseintrag bearbeiten
+
+Ein Mitarbeiter klickt auf "Bearbeiten" bei Tätigkeit Nr. 7. Das schickt eine Anfrage an `POST /activities/7`.
+
+**1. Router** erkennt das Muster `/activities/{id}` und ruft `ActivityController::update("7")` auf.
+
+**2. Controller** stellt zunächst fest, wer die Anfrage stellt — aus der Session, ohne Datenbankabfrage:
+
+```php
+$this->currentUserId();  // → 5
+$this->currentRole();    // → 'member'
+```
+
+**3. Controller** lädt die Tätigkeit aus der Datenbank — er braucht die Daten um zu prüfen, ob der Zugriff erlaubt ist:
+
+```php
+$activity = Activity::findById(7);
+// → ['id' => 7, 'created_at' => '2025-05-01 14:30', 'order_id' => 42, ...]
+```
+
+**4. Controller** prüft die Berechtigung mit `Activity::isEditable()`:
+
+```php
+Activity::isEditable($activity, $this->currentUserId(), $this->currentRole())
+```
+
+Intern passiert dabei folgendes:
+
+- Rolle `admin` oder `coordinator`? → sofort erlaubt
+- Sonst: War der Mitarbeiter an dieser Tätigkeit beteiligt? → Abfrage in `activity_users`-Tabelle
+- Und: Liegt der Eintrag noch innerhalb des konfigurierten Zeitfensters (`ACTIVITY_EDIT_DAYS`)?
+
+**5a. Zugriff verweigert** → `$this->forbidden()` → HTTP 403, Fehlermeldung, Ausführung endet.
+
+**5b. Zugriff erlaubt** → Tätigkeit wird aktualisiert (Model → Datenbank) → Weiterleitung zum Auftrag.
+
+Der Rest des Ablaufs — Model, Datenbank, View — funktioniert genauso wie in [docs/konzepte.md](konzepte.md#mvc--model-view-controller) beschrieben.
