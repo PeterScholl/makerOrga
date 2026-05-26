@@ -14,6 +14,12 @@ class User extends Model
         return $result !== false ? $result : null;
     }
 
+    public static function findAllSorted(): array
+    {
+        $stmt = static::db()->query('SELECT * FROM ' . static::$table . ' ORDER BY name');
+        return $stmt->fetchAll();
+    }
+
     public static function findByUsername(string $username): ?array
     {
         $stmt = static::db()->prepare('SELECT * FROM users WHERE username = ?');

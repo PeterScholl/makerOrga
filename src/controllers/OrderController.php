@@ -18,7 +18,7 @@ class OrderController extends Controller
         }
         $activities = Activity::findByOrder((int) $id);
         $customers  = Customer::findAll();
-        $users      = User::findAll();
+        $users      = User::findAllSorted();
         $this->render('orders/show', compact('order', 'activities', 'customers', 'users'));
     }
 
@@ -37,7 +37,7 @@ class OrderController extends Controller
     {
         $this->requireRole('admin', 'coordinator');
         $customers = Customer::findAll();
-        $users     = User::findAll();
+        $users     = User::findAllSorted();
         $this->render('orders/form', ['order' => null, 'customers' => $customers, 'users' => $users]);
     }
 
@@ -67,7 +67,7 @@ class OrderController extends Controller
             $this->forbidden();
         }
         $customers = Customer::findAll();
-        $users     = User::findAll();
+        $users     = User::findAllSorted();
         $this->render('orders/form', compact('order', 'customers', 'users'));
     }
 

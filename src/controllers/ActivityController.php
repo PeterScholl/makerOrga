@@ -5,7 +5,7 @@ class ActivityController extends Controller
     public function store(): void
     {
         $orderId = ($_POST['order_id'] ?? '') ?: null;
-        $userIds = $_POST['user_ids'] ?? [];
+        $userIds = array_values(array_unique(array_filter($_POST['user_ids'] ?? [])));
 
         Activity::create([
             'order_id'    => $orderId,

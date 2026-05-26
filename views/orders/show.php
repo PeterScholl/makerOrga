@@ -111,15 +111,40 @@
                     <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
 
                     <div class="mb-2">
-                        <select name="user_ids[]" class="form-select form-select-sm" multiple required size="4">
+                        <select name="user_ids[]" id="primary-worker"
+                                class="form-select form-select-sm" required>
+                            <option value="">— Mitarbeiter wählen —</option>
                             <?php foreach ($users as $user): ?>
                             <option value="<?= $user['id'] ?>"><?= e($user['name']) ?></option>
                             <?php endforeach ?>
                         </select>
-                        <div class="form-text">Mehrere auswählbar (Strg/Cmd gedrückt halten)</div>
                     </div>
+
+                    <?php if (count($users) > 1): ?>
                     <div class="mb-2">
-                        <input type="datetime-local" name="worked_at" class="form-control form-control-sm"
+                        <button type="button" id="toggle-extra-workers"
+                                class="btn btn-sm btn-link ps-0 text-decoration-none text-secondary">
+                            <i class="bi bi-person-plus"></i> Weitere Mitarbeiter hinzufügen
+                        </button>
+                        <div id="extra-workers-panel" class="d-none mt-1 border rounded p-2">
+                            <p class="small text-muted mb-1">Weitere Beteiligte (optional):</p>
+                            <?php foreach ($users as $user): ?>
+                            <div class="form-check">
+                                <input class="form-check-input extra-worker" type="checkbox"
+                                       name="user_ids[]" value="<?= $user['id'] ?>"
+                                       id="extra_<?= $user['id'] ?>">
+                                <label class="form-check-label small" for="extra_<?= $user['id'] ?>">
+                                    <?= e($user['name']) ?>
+                                </label>
+                            </div>
+                            <?php endforeach ?>
+                        </div>
+                    </div>
+                    <?php endif ?>
+
+                    <div class="mb-2">
+                        <input type="datetime-local" name="worked_at"
+                               class="form-control form-control-sm"
                                value="<?= date('Y-m-d\TH:i') ?>" required>
                     </div>
                     <div class="mb-2">
@@ -128,6 +153,33 @@
                     </div>
                     <button class="btn btn-sm btn-primary">Eintragen</button>
                 </form>
+
+                <script>
+                (function () {
+                    const primary = document.getElementById('primary-worker');
+                    const toggle  = document.getElementById('toggle-extra-workers');
+                    const panel   = document.getElementById('extra-workers-panel');
+                    const extras  = document.querySelectorAll('.extra-worker');
+
+                    function syncDisabled() {
+                        extras.forEach(cb => {
+                            cb.disabled = cb.value === primary.value;
+                            if (cb.disabled) cb.checked = false;
+                        });
+                    }
+
+                    toggle?.addEventListener('click', () => {
+                        panel.classList.toggle('d-none');
+                        const open = !panel.classList.contains('d-none');
+                        toggle.innerHTML = open
+                            ? '<i class="bi bi-dash-circle"></i> Weitere ausblenden'
+                            : '<i class="bi bi-person-plus"></i> Weitere Mitarbeiter hinzufügen';
+                        if (open) syncDisabled();
+                    });
+
+                    primary?.addEventListener('change', syncDisabled);
+                })();
+                </script>
 
             </div>
         </div>
