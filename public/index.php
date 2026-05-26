@@ -4,6 +4,12 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../src/helpers.php';
 
+// Lokale Konfiguration einbinden, falls vorhanden (überschreibt Standardwerte)
+if (file_exists(__DIR__ . '/../config/local.php')) {
+    require_once __DIR__ . '/../config/local.php';
+}
+require_once __DIR__ . '/../config/database.php';
+
 session_start();
 
 // ── Zugriffsschutz ────────────────────────────────────────────────────────────
@@ -51,6 +57,7 @@ $router->post('/users/{id}',       [UserController::class, 'update']);
 
 // ── Tätigkeiten ───────────────────────────────────────────────────────────────
 $router->post('/activities',             [ActivityController::class, 'store']);
+$router->get('/activities/{id}/edit',    [ActivityController::class, 'edit']);
 $router->post('/activities/{id}',        [ActivityController::class, 'update']);
 $router->post('/activities/{id}/delete', [ActivityController::class, 'destroy']);
 

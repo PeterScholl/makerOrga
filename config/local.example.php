@@ -14,3 +14,7 @@
 
 // Passwort für den Browser-Zugang zu public/setup.php
 define('SETUP_PASSWORD', 'hier-eigenes-passwort-eintragen');
+
+// Wie viele Tage darf ein Mitarbeiter seine Tätigkeit noch bearbeiten?
+// 0 = kein Zeitlimit. Admins und Koordinatoren sind davon nicht betroffen.
+// define('ACTIVITY_EDIT_DAYS', 7);

@@ -40,6 +40,36 @@ class Activity extends Model
         return $stmt->fetchAll();
     }
 
+    // Gibt alle zugewiesenen User-IDs einer Tätigkeit zurück.
+    public static function getUserIds(int $activityId): array
+    {
+        $stmt = static::db()->prepare('SELECT user_id FROM activity_users WHERE activity_id = ?');
+        $stmt->execute([$activityId]);
+        return array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
+    }
+
+    /**
+     * Prüft ob ein Benutzer diese Tätigkeit noch bearbeiten darf.
+     * Admins und Koordinatoren dürfen immer. Mitarbeiter nur wenn sie
+     * zugewiesen sind und das Zeitfenster (ACTIVITY_EDIT_DAYS) nicht abgelaufen ist.
+     */
+    public static function isEditable(array $activity, int $userId, string $role): bool
+    {
+        if (in_array($role, ['admin', 'coordinator'], true)) {
+            return true;
+        }
+
+        if (!in_array($userId, static::getUserIds((int) $activity['id']), true)) {
+            return false;
+        }
+
+        $days = (int) ACTIVITY_EDIT_DAYS;
+        if ($days === 0) return true;
+
+        $ageSeconds = time() - strtotime($activity['created_at']);
+        return $ageSeconds <= ($days * 86400);
+    }
+
     /**
      * Tätigkeit anlegen und Mitarbeiter in der Zwischentabelle eintragen.
      * $data muss 'user_ids' als Array enthalten.

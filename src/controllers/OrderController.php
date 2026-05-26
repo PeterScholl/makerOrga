@@ -19,7 +19,13 @@ class OrderController extends Controller
         $activities = Activity::findByOrder((int) $id);
         $customers  = Customer::findAll();
         $users      = User::findAllSorted();
-        $this->render('orders/show', compact('order', 'activities', 'customers', 'users'));
+
+        $editableActivityIds = array_column(
+            array_filter($activities, fn($a) => Activity::isEditable($a, $this->currentUserId(), $this->currentRole())),
+            'id'
+        );
+
+        $this->render('orders/show', compact('order', 'activities', 'customers', 'users', 'editableActivityIds'));
     }
 
     // Admin und Koordinator dürfen jeden Auftrag bearbeiten.
