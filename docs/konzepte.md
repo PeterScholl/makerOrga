@@ -130,6 +130,63 @@ Ein Architekturmuster das den Code in drei klar getrennte Verantwortlichkeiten a
 **Warum?**  
 Wenn man z.B. das Design der Auftragsliste ändern will, fasst man nur die View an — nicht die Datenbanklogik. Änderungen bleiben lokal und beeinflussen nichts anderes.
 
+### Beispiel: Ein Auftrag wird aufgerufen (`GET /orders/42`)
+
+**Ziel:** Ein Mitarbeiter möchte die Detailseite von Auftrag Nr. 42 sehen — Titel, Status, zugehörige Tätigkeiten usw. Er klickt in der Liste auf den Auftrag, und der Browser ruft `/orders/42` auf.
+
+Was passiert dabei Schritt für Schritt?
+
+**1. Router** — `public/index.php`  
+Der Router erkennt das Muster `/orders/{id}` und übergibt die Anfrage an den zuständigen Controller:
+
+```php
+$router->get('/orders/{id}', [OrderController::class, 'show']);
+```
+
+**2. Controller** — `OrderController::show()`  
+Der Controller übernimmt die Steuerung. Er entscheidet, welche Daten er braucht, holt sie aus den Models und gibt sie an die View weiter:
+
+```php
+public function show(string $id): void
+{
+    $order      = Order::findById((int) $id);        // Auftrag aus DB
+    $activities = Activity::findByOrder((int) $id);  // Tätigkeiten dazu
+    $users      = User::findAllSorted();              // für das Formular
+    $this->render('orders/show', compact('order', 'activities', 'users'));
+}
+```
+
+**3. Model** — z.B. `Order::findById(42)`  
+Das Model führt die SQL-Abfrage aus und gibt ein Array zurück — es weiß nichts davon, dass es gerade eine Web-Anfrage gibt:
+
+```php
+public static function findById(int $id): ?array
+{
+    $stmt = static::db()->prepare('SELECT * FROM orders WHERE id = ?');
+    $stmt->execute([$id]);
+    return $stmt->fetch() ?: null;
+}
+```
+
+**4. View** — `views/orders/show.php`  
+Die View bekommt die Daten als PHP-Variablen und baut daraus HTML. Sie enthält keine Datenbankaufrufe:
+
+```php
+<h1><?= e($order['title']) ?></h1>
+<p>Status: <?= statusBadge($order['status']) ?></p>
+```
+
+**5. Antwort ans Browser**  
+Der fertige HTML-Code wird an den Browser geschickt. Der Nutzer sieht die Auftragsseite.
+
+```text
+Browser  →  Router  →  Controller  →  Model  →  Datenbank
+                    ←              ←         ←
+                         View (HTML)
+                    ↓
+                 Browser
+```
+
 ---
 
 ## Migrationen
@@ -173,6 +230,23 @@ In diesem Projekt nutzen wir es für die Datenbankverbindung: Eine PDO-Verbindun
 $pdo = Database::connection(); // baut Verbindung auf (nur beim ersten Aufruf)
 $pdo = Database::connection(); // gibt dieselbe Verbindung zurück
 ```
+
+**Aber wie — HTTP ist doch zustandslos?**  
+Das ist ein wichtiger Unterschied: Das Singleton-Objekt überlebt *keine* Anfragen — es lebt nur *innerhalb* einer einzigen Anfrage.
+
+In PHP wird das Skript bei jeder HTTP-Anfrage komplett neu gestartet. Es gibt keinen dauerhaft laufenden Serverprozess der sich etwas merkt (anders als z.B. bei Node.js). Das heißt: Sobald der Server die Antwort geschickt hat, wird das gesamte PHP-Skript beendet — alle Variablen, Objekte und die Datenbankverbindung werden aus dem Arbeitsspeicher gelöscht.
+
+Das Singleton löst ein anderes Problem: Innerhalb *einer* Anfrage werden oft viele Datenbankzugriffe gemacht — `Order::findById()`, `Activity::findByOrder()`, `User::findAllSorted()` usw. Ohne Singleton würde jede dieser Methoden eine neue Verbindung aufbauen. Das Singleton stellt sicher, dass alle Aufrufe dieselbe Verbindung wiederverwenden:
+
+```text
+Anfrage startet       → PHP-Skript beginnt, noch keine DB-Verbindung
+Order::findById(42)   → Database::connection() erstellt neue PDO-Verbindung, speichert sie
+Activity::findBy...   → Database::connection() gibt dieselbe Verbindung zurück
+User::findAllSorted() → Database::connection() gibt dieselbe Verbindung zurück
+Antwort gesendet      → PHP-Skript endet, Verbindung wird freigegeben
+```
+
+Beim nächsten Seitenaufruf beginnt alles von vorne.
 
 ---
 
