@@ -279,7 +279,7 @@ $this->render('orders/index', ['orders' => $orders]);
 // In der View ist dann $orders direkt verfügbar
 ```
 
-Intern nutzt `render()` einen Output-Buffer: Die View wird zunächst unsichtbar gerendert, das Ergebnis als `$content` gespeichert und dann ins Layout eingebettet.
+Intern nutzt `render()` einen Output-Buffer: Die View wird zunächst unsichtbar gerendert, das Ergebnis als `$content` gespeichert und dann ins Layout eingebettet. Wie das genau funktioniert erklärt der Abschnitt [Layout und Templates](#layout-und-templates) weiter unten.
 
 **`redirect(string $path)`**  
 Schickt den Browser auf eine andere URL. Wird nach jedem erfolgreichen Speichern aufgerufen (siehe Post/Redirect/Get weiter unten):
@@ -295,6 +295,39 @@ Entfernt Leerzeichen am Anfang und Ende eines Textes. Gibt `null` zurück wenn d
 $this->clean('  Hallo  ');  // → 'Hallo'
 $this->clean('   ');        // → null
 ```
+
+---
+
+## Layout und Templates
+
+Jede Seite der App sieht gleich aus: oben die Navbar, unten der Footer, dazwischen der eigentliche Inhalt. Damit Navbar und Footer nicht in jeder View-Datei wiederholt werden müssen, gibt es eine einzige Layout-Datei: `views/layout/main.php`.
+
+**Wie `render()` das umsetzt:**
+
+```php
+// In Controller::render():
+ob_start();                               // 1. Output-Buffer einschalten
+require 'views/' . $view . '.php';        // 2. View-Datei ausführen — Output landet im Buffer
+$content = ob_get_clean();               // 3. Buffer-Inhalt in $content speichern, Buffer leeren
+
+require 'views/layout/main.php';          // 4. Layout laden — $content ist darin verfügbar
+```
+
+`ob_start()` / `ob_get_clean()` ist ein PHP-Trick: Normalerweise würde `require` den HTML-Output sofort an den Browser schicken. Mit dem Output-Buffer wird alles abgefangen und als String in `$content` gespeichert. Das Layout kann diesen String dann an der richtigen Stelle einsetzen:
+
+```php
+<!-- views/layout/main.php -->
+<nav>...</nav>
+
+<main>
+    <?= $content ?>   <!-- hier erscheint der Inhalt der jeweiligen View -->
+</main>
+
+<footer>...</footer>
+```
+
+**Was das bedeutet:**  
+Navbar, Footer, CSS-Links, JavaScript — alles steht einmal in `views/layout/main.php` und gilt automatisch für jede Seite. Will man z.B. den Footer ändern, fasst man nur diese eine Datei an.
 
 ---
 

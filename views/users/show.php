@@ -5,9 +5,11 @@
         </a>
         <h1 class="h3 mt-1"><?= e($user['name']) ?></h1>
     </div>
+    <?php if (($_SESSION['user_role'] ?? '') === 'admin'): ?>
     <a href="/users/<?= $user['id'] ?>/edit" class="btn btn-outline-secondary">
         <i class="bi bi-pencil"></i> Bearbeiten
     </a>
+    <?php endif ?>
 </div>
 
 <div class="row g-4">
@@ -31,6 +33,40 @@
             </div>
         </div>
     </div>
+
+    <?php
+    $isOwnProfile = (int) ($_SESSION['user_id'] ?? 0) === (int) $user['id'];
+    $isAdmin      = ($_SESSION['user_role'] ?? '') === 'admin';
+    if ($isOwnProfile || $isAdmin):
+    ?>
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-header fw-semibold">Passwort ändern</div>
+            <div class="card-body">
+                <form method="post" action="/users/<?= $user['id'] ?>/password">
+                    <?php if ($isOwnProfile): ?>
+                    <div class="mb-2">
+                        <label class="form-label small">Aktuelles Passwort</label>
+                        <input type="password" name="current_password"
+                               class="form-control form-control-sm" required autocomplete="current-password">
+                    </div>
+                    <?php endif ?>
+                    <div class="mb-2">
+                        <label class="form-label small">Neues Passwort</label>
+                        <input type="password" name="new_password"
+                               class="form-control form-control-sm" required autocomplete="new-password">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small">Neues Passwort bestätigen</label>
+                        <input type="password" name="confirm_password"
+                               class="form-control form-control-sm" required autocomplete="new-password">
+                    </div>
+                    <button class="btn btn-sm btn-primary">Speichern</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <?php endif ?>
 
     <div class="col-md-8">
         <div class="card shadow-sm">

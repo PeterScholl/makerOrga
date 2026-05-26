@@ -52,8 +52,9 @@ $router->get('/users',             [UserController::class, 'index']);
 $router->get('/users/new',         [UserController::class, 'create']);
 $router->post('/users',            [UserController::class, 'store']);
 $router->get('/users/{id}',        [UserController::class, 'show']);
-$router->get('/users/{id}/edit',   [UserController::class, 'edit']);
-$router->post('/users/{id}',       [UserController::class, 'update']);
+$router->get('/users/{id}/edit',      [UserController::class, 'edit']);
+$router->post('/users/{id}',          [UserController::class, 'update']);
+$router->post('/users/{id}/password', [UserController::class, 'changePassword']);
 
 // ── Tätigkeiten ───────────────────────────────────────────────────────────────
 $router->post('/activities',             [ActivityController::class, 'store']);
