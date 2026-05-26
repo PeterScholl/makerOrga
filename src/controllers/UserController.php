@@ -65,4 +65,38 @@ class UserController extends Controller
         User::update((int) $id, $data);
         $this->redirect('/users/' . $id);
     }
+
+    public function changePassword(string $id): void
+    {
+        // Nur eigenes Profil oder Admin
+        if ($this->currentUserId() !== (int) $id && $this->currentRole() !== 'admin') {
+            $this->forbidden();
+        }
+
+        $user = User::findById((int) $id);
+        if (!$user) {
+            $this->redirect('/users');
+        }
+
+        // Eigenes Passwort: aktuelles Passwort muss stimmen
+        if ($this->currentUserId() === (int) $id) {
+            $current = $_POST['current_password'] ?? '';
+            if (!password_verify($current, $user['password'])) {
+                $_SESSION['flash'] = ['type' => 'danger', 'text' => 'Das aktuelle Passwort ist falsch.'];
+                $this->redirect('/users/' . $id);
+            }
+        }
+
+        $new     = $_POST['new_password'] ?? '';
+        $confirm = $_POST['confirm_password'] ?? '';
+
+        if (empty($new) || $new !== $confirm) {
+            $_SESSION['flash'] = ['type' => 'danger', 'text' => 'Die Passwörter stimmen nicht überein oder sind leer.'];
+            $this->redirect('/users/' . $id);
+        }
+
+        User::update((int) $id, ['password' => password_hash($new, PASSWORD_BCRYPT)]);
+        $_SESSION['flash'] = ['type' => 'success', 'text' => 'Passwort erfolgreich geändert.'];
+        $this->redirect('/users/' . $id);
+    }
 }
