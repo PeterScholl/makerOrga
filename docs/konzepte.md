@@ -365,6 +365,28 @@ Nach einem erfolgreichen POST nicht die View direkt ausgeben, sondern auf eine G
 
 In jedem Controller sieht das so aus: `store()` und `update()` enden immer mit `$this->redirect(...)`.
 
+### Flash-Meldungen
+
+Post/Redirect/Get löst das Doppel-Submit-Problem — schafft aber ein neues: Nach dem Redirect weiß die GET-Seite nicht mehr, ob der POST erfolgreich war. Wie zeigt man dem Nutzer also "Passwort gespeichert" oder "Etwas ist schiefgelaufen"?
+
+**Die Lösung:** Kurz vor dem Redirect wird eine Nachricht in die Session geschrieben. Der nächste GET-Request liest sie aus — und löscht sie sofort wieder, damit sie nur einmal erscheint.
+
+```php
+// Controller: vor dem Redirect
+$_SESSION['flash'] = ['type' => 'success', 'text' => 'Passwort gespeichert.'];
+$this->redirect('/users/' . $id);
+```
+
+```php
+// views/layout/main.php: beim nächsten Seitenaufruf
+if (!empty($_SESSION['flash'])) {
+    // grüne oder rote Bootstrap-Meldung anzeigen
+    unset($_SESSION['flash']);   // sofort löschen — erscheint nur einmal
+}
+```
+
+Die Session dient hier als kurzzeitiger Briefkasten: eine Seite legt etwas rein, die nächste nimmt es raus. Daher der Name *Flash* — die Nachricht blitzt einmal auf und ist dann weg.
+
 ---
 
 ## Authentifizierung und Sessions
@@ -437,6 +459,32 @@ Selbst wenn jemand die Datenbank stiehlt, kann er die Passwörter nicht lesen.
 ### Session-Regenerierung
 
 Nach einem erfolgreichen Login rufen wir `session_regenerate_id(true)` auf. Das klingt technisch, hat aber einen wichtigen Grund: Es verhindert **Session-Fixation** — einen Angriff bei dem jemand eine fremde Session-ID einschleust und dann nach dem Login dieselbe ID übernimmt. Durch die Regenerierung bekommt der eingeloggte Benutzer eine neue, unvorhersehbare ID.
+
+---
+
+### GET-Parameter als Zustand
+
+Manchmal hat eine Seite einen Zustand der kein Login-Zustand ist: ein aktiver Filter, eine Sortierung, eine Seitenzahl. Man könnte das in der Session speichern — aber dann gehen zwei Dinge verloren:
+
+- **Teilbarkeit**: Wer die URL kopiert, bekommt nicht denselben Zustand zu sehen.
+- **Browser-Navigation**: Zurück- und Vorwärts-Button funktionieren nicht wie erwartet.
+
+**Die Alternative:** Zustand in der URL speichern, als GET-Parameter.
+
+```text
+/orders?status[]=open&status[]=in_progress&sort=priority&dir=asc
+```
+
+Der Controller liest die Parameter aus `$_GET` und gibt sie an das Model weiter. Der Seitenaufruf ist dadurch vollständig in der URL beschrieben — Reload, Kopieren, Bookmarken und Browser-Back funktionieren alle korrekt.
+
+**Wann Session, wann GET-Parameter?**
+
+| Situation | Wohin damit? |
+| --------- | ------------ |
+| Wer ist eingeloggt? | Session — gehört nicht in die URL |
+| Flash-Meldung nach Redirect | Session — einmalig, kein URL-Ballast |
+| Aktiver Filter in einer Liste | GET-Parameter — URL soll teilbar sein |
+| Aktuelle Seite in einer Tabelle | GET-Parameter — Browser-Back soll funktionieren |
 
 ---
 

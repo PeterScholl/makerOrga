@@ -4,8 +4,17 @@ class OrderController extends Controller
 {
     public function index(): void
     {
-        $orders = Order::findAllWithRelations();
-        $this->render('orders/index', ['orders' => $orders]);
+        $filters = [
+            // Kein status-Filter gesetzt → abgeschlossene Aufträge standardmäßig ausblenden
+            'status'   => isset($_GET['status']) ? $_GET['status'] : ['open', 'in_progress'],
+            'priority' => $_GET['priority'] ?? [],
+            'type'     => $_GET['type']     ?? [],
+        ];
+        $sort = $_GET['sort'] ?? 'received_at';
+        $dir  = $_GET['dir']  ?? 'desc';
+
+        $orders = Order::findAllWithRelations($filters, $sort, $dir);
+        $this->render('orders/index', compact('orders', 'filters', 'sort', 'dir'));
     }
 
     public function show(string $id): void

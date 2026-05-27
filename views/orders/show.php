@@ -9,7 +9,10 @@
         <a href="/orders" class="text-muted small text-decoration-none">
             <i class="bi bi-arrow-left"></i> Zurück zur Liste
         </a>
-        <h1 class="h3 mt-1"><?= e($order['title']) ?></h1>
+        <h1 class="h3 mt-1">
+            <?= e($order['title']) ?>
+            <span class="text-muted fw-normal fs-5 ms-1">#<?= $order['id'] ?></span>
+        </h1>
     </div>
     <div class="d-flex gap-2">
         <a href="/orders/<?= $order['id'] ?>/edit" class="btn btn-outline-secondary">
