@@ -15,6 +15,7 @@
     <table class="table table-hover bg-white shadow-sm rounded">
         <thead class="table-dark">
             <tr>
+                <th class="text-muted fw-normal" style="width:3rem">Nr.</th>
                 <th>Titel</th>
                 <th>Typ</th>
                 <th>Status</th>
@@ -28,6 +29,7 @@
         <tbody>
             <?php foreach ($orders as $order): ?>
             <tr>
+                <td class="text-muted small"><?= $order['id'] ?></td>
                 <td>
                     <a href="/orders/<?= $order['id'] ?>" class="text-decoration-none fw-semibold">
                         <?= htmlspecialchars($order['title']) ?>
