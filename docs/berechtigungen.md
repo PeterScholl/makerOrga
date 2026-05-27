@@ -10,7 +10,7 @@ Wer darf was? Diese Datei ist eine Nachschlagehilfe — das Konzept dahinter ste
 |-------|-------------|
 | `admin` | Vollzugriff auf alles. Verwaltet Benutzer und Kontaktdaten von Kunden. |
 | `coordinator` | Kann Aufträge anlegen und vollständig bearbeiten (inkl. Zuweisung). Kann Kunden anlegen und deren Namen/Notizen bearbeiten. Kann keine Benutzer verwalten. |
-| `member` | Kann eigene zugewiesene Aufträge bearbeiten (Status, Beschreibung, Ergebnis). Kann keine Aufträge anlegen oder Zuweisungen ändern. |
+| `member` | Kann zugewiesene Aufträge bearbeiten (Status, Beschreibung, Ergebnis). Kann Tätigkeiten zu **beliebigen** Aufträgen eintragen — nicht nur zu eigenen. Kann eigene Tätigkeiten innerhalb des Zeitfensters bearbeiten und löschen. Kann keine Aufträge anlegen oder Zuweisungen ändern. |
 
 ---
 
@@ -61,8 +61,20 @@ Kundenzuweisung, Mitarbeiterzuweisung.
 
 ## Tätigkeiten
 
-Tätigkeiten sind Einträge zu einem Auftrag oder unabhängig davon.  
-_(Berechtigungen werden ergänzt sobald die Tätigkeitsverwaltung ausgebaut ist.)_
+Tätigkeiten sind Arbeitseinträge zu einem Auftrag (oder auftragsunabhängig).
+
+| Aktion | admin | coordinator | member |
+| ------ | :---: | :---------: | :----: |
+| Tätigkeit eintragen (zu beliebigem Auftrag) | ✓ | ✓ | ✓ |
+| Eigene Tätigkeit bearbeiten (im Zeitfenster) | ✓ | ✓ | ✓ |
+| Beliebige Tätigkeit bearbeiten | ✓ | ✓ | — |
+| Eigene Tätigkeit löschen (im Zeitfenster) | ✓ | ✓ | ✓ |
+| Beliebige Tätigkeit löschen | ✓ | ✓ | — |
+| Tätigkeitsübersicht aller Mitarbeiter | ✓ | — | — |
+
+**Wichtig:** Die Zuweisung eines Auftrags schränkt nur das *Bearbeiten des Auftrags selbst* ein — nicht das Eintragen von Tätigkeiten. Ein Mitarbeiter der an einem Auftrag mitarbeitet aber nicht als Hauptverantwortlicher eingetragen ist, kann trotzdem Tätigkeitseinträge dazu erstellen.
+
+**Zeitfenster:** Wie lange ein Mitarbeiter eigene Einträge nachbearbeiten kann, ist in `config/local.php` über `ACTIVITY_EDIT_DAYS` konfigurierbar (Standard: 14 Tage). Admin und Koordinator haben kein Zeitlimit.
 
 ---
 
