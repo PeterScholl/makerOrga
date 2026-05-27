@@ -28,6 +28,11 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/users">Mitarbeiter</a>
                 </li>
+                <?php if (($_SESSION['user_role'] ?? '') === 'admin'): ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="/activities">Tätigkeiten</a>
+                </li>
+                <?php endif ?>
             </ul>
             <div class="d-flex align-items-center gap-3">
                 <a class="text-white-50 small text-decoration-none"

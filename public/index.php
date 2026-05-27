@@ -57,6 +57,7 @@ $router->post('/users/{id}',          [UserController::class, 'update']);
 $router->post('/users/{id}/password', [UserController::class, 'changePassword']);
 
 // ── Tätigkeiten ───────────────────────────────────────────────────────────────
+$router->get('/activities',              [ActivityController::class, 'index']);
 $router->post('/activities',             [ActivityController::class, 'store']);
 $router->get('/activities/{id}/edit',    [ActivityController::class, 'edit']);
 $router->post('/activities/{id}',        [ActivityController::class, 'update']);
