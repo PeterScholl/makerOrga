@@ -5,7 +5,8 @@ class OrderController extends Controller
     public function index(): void
     {
         $filters = [
-            'status'   => $_GET['status']   ?? [],
+            // Kein status-Filter gesetzt → abgeschlossene Aufträge standardmäßig ausblenden
+            'status'   => isset($_GET['status']) ? $_GET['status'] : ['open', 'in_progress'],
             'priority' => $_GET['priority'] ?? [],
             'type'     => $_GET['type']     ?? [],
         ];

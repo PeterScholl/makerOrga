@@ -53,7 +53,7 @@ $sortIcon = function (string $col) use ($sort, $dir): string {
     </div>
 </div>
 
-<div class="collapse <?= $activeFilterCount > 0 ? 'show' : '' ?>" id="filter-panel">
+<div class="collapse" id="filter-panel">
     <div class="card shadow-sm mb-3">
         <div class="card-body">
             <form method="get" action="/orders" class="row g-3">
@@ -100,7 +100,8 @@ $sortIcon = function (string $col) use ($sort, $dir): string {
 
                 <div class="col-12 d-flex gap-2">
                     <button class="btn btn-sm btn-primary">Anwenden</button>
-                    <a href="/orders" class="btn btn-sm btn-outline-secondary">Zurücksetzen</a>
+                    <a href="/orders?status[]=open&status[]=in_progress&status[]=done&status[]=closed"
+                       class="btn btn-sm btn-outline-secondary">Alle anzeigen</a>
                 </div>
             </form>
         </div>
@@ -114,7 +115,7 @@ $sortIcon = function (string $col) use ($sort, $dir): string {
     <table class="table table-hover bg-white shadow-sm rounded">
         <thead class="table-dark">
             <tr>
-                <th class="fw-normal" style="width:3.5rem">
+                <th class="text-nowrap" style="width:3.5rem">
                     <a href="<?= $sortUrl('id') ?>" class="text-white text-decoration-none">
                         Nr.<?= $sortIcon('id') ?>
                     </a>
@@ -135,8 +136,16 @@ $sortIcon = function (string $col) use ($sort, $dir): string {
                         Priorität<?= $sortIcon('priority') ?>
                     </a>
                 </th>
-                <th>Kunde</th>
-                <th>Mitarbeiter</th>
+                <th>
+                    <a href="<?= $sortUrl('customer_name') ?>" class="text-white text-decoration-none">
+                        Kunde<?= $sortIcon('customer_name') ?>
+                    </a>
+                </th>
+                <th>
+                    <a href="<?= $sortUrl('assigned_user_name') ?>" class="text-white text-decoration-none">
+                        Mitarbeiter<?= $sortIcon('assigned_user_name') ?>
+                    </a>
+                </th>
                 <th>
                     <a href="<?= $sortUrl('received_at') ?>" class="text-white text-decoration-none">
                         Abgabe<?= $sortIcon('received_at') ?>

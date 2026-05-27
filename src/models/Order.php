@@ -10,11 +10,19 @@ class Order extends Model
      */
     public static function findAllWithRelations(array $filters = [], string $sort = 'received_at', string $dir = 'desc'): array
     {
-        // Whitelist gegen SQL-Injection
-        $allowedSort = ['id', 'title', 'status', 'priority', 'received_at'];
-        $allowedDir  = ['asc', 'desc'];
-        $sort = in_array($sort, $allowedSort, true) ? $sort : 'received_at';
-        $dir  = in_array($dir,  $allowedDir,  true) ? $dir  : 'desc';
+        // Map von GET-Parameter auf SQL-Ausdruck (verhindert SQL-Injection)
+        $sortMap = [
+            'id'                 => 'orders.id',
+            'title'              => 'orders.title',
+            'status'             => 'orders.status',
+            'priority'           => 'orders.priority',
+            'received_at'        => 'orders.received_at',
+            'customer_name'      => 'customers.name',
+            'assigned_user_name' => 'users.name',
+        ];
+        $allowedDir = ['asc', 'desc'];
+        $sortExpr = $sortMap[$sort] ?? 'orders.received_at';
+        $dir      = in_array($dir, $allowedDir, true) ? $dir : 'desc';
 
         $where  = [];
         $params = [];
@@ -38,7 +46,7 @@ class Order extends Model
             LEFT JOIN customers ON orders.customer_id      = customers.id
             LEFT JOIN users     ON orders.assigned_user_id = users.id
             $whereClause
-            ORDER BY orders.$sort $dir
+            ORDER BY $sortExpr $dir
         ";
 
         $stmt = static::db()->prepare($sql);
