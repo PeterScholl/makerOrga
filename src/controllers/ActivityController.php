@@ -2,6 +2,21 @@
 
 class ActivityController extends Controller
 {
+    public function index(): void
+    {
+        $this->requireRole('admin');
+
+        $filters = [
+            'from'    => $_GET['from']    ?? date('Y-m-01'),
+            'to'      => $_GET['to']      ?? date('Y-m-t'),
+            'user_id' => ($_GET['user_id'] ?? '') ?: null,
+        ];
+
+        $activities = Activity::findFiltered($filters);
+        $users      = User::findAllSorted();
+        $this->render('activities/index', compact('activities', 'users', 'filters'));
+    }
+
     public function store(): void
     {
         $orderId = ($_POST['order_id'] ?? '') ?: null;

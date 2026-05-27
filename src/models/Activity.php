@@ -71,6 +71,47 @@ class Activity extends Model
     }
 
     /**
+     * Gefilterte Tätigkeitsliste für die Admin-Übersicht.
+     * $filters: 'from' (Y-m-d), 'to' (Y-m-d), 'user_id' (int|null)
+     */
+    public static function findFiltered(array $filters): array
+    {
+        $from   = ($filters['from'] ?? date('Y-m-01')) . ' 00:00:00';
+        $to     = ($filters['to']   ?? date('Y-m-t'))  . ' 23:59:59';
+        $userId = isset($filters['user_id']) ? (int) $filters['user_id'] : null;
+
+        $sql = "
+            SELECT activities.*,
+                   GROUP_CONCAT(users.name, ', ') AS user_names,
+                   orders.title AS order_title
+            FROM activities
+            JOIN activity_users ON activities.id = activity_users.activity_id
+            JOIN users          ON activity_users.user_id = users.id
+            LEFT JOIN orders    ON activities.order_id = orders.id
+            WHERE activities.worked_at >= :from
+              AND activities.worked_at <= :to
+        ";
+
+        // Subquery statt JOIN-Filter, damit GROUP_CONCAT alle Beteiligten zeigt
+        if ($userId) {
+            $sql .= " AND activities.id IN (
+                          SELECT activity_id FROM activity_users WHERE user_id = :uid
+                      )";
+        }
+
+        $sql .= " GROUP BY activities.id ORDER BY activities.worked_at DESC";
+
+        $stmt = static::db()->prepare($sql);
+        $stmt->bindValue(':from', $from);
+        $stmt->bindValue(':to',   $to);
+        if ($userId) {
+            $stmt->bindValue(':uid', $userId, PDO::PARAM_INT);
+        }
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    /**
      * Tätigkeit anlegen und Mitarbeiter in der Zwischentabelle eintragen.
      * $data muss 'user_ids' als Array enthalten.
      */
